@@ -1,6 +1,6 @@
 {
-  "name": "@scaffold-eth/vite-app",
-  "version": "0.3.0",
+  "name": "safe-pg",
+  "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "start": "cross-env ENVIRONMENT=DEVELOPMENT vite --force",
