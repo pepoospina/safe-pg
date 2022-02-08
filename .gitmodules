@@ -1,0 +1,12 @@
+[submodule "safe-contracts"]
+	path = safe-contracts
+	url = git@github.com:gnosis/safe-contracts.git
+	branch = main
+[submodule "safe-core-sdk"]
+	path = safe-core-sdk
+	url = git@github.com:gnosis/safe-core-sdk.git 
+	branch = main
+[submodule "safe-pg"]
+	path = safe-pg
+	url = git@github.com:pepoospina/safe-pg.git
+	branch = main

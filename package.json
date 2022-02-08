@@ -1,0 +1,29 @@
+{
+  "name": "dev",
+  "version": "0.0.0",
+  "description": "Test",
+  "license": "MIT",
+  "scripts": {
+    "chain": "yarn workspace @gnosis.pm/safe-contracts chain",
+    "deploy-local": "yarn workspace @gnosis.pm/safe-contracts deploy-local",
+    "start": "yarn workspace safe-pg start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnosis/gnosis-safe.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "Wallet",
+    "Safe"
+  ],
+  "author": "stefan@gnosis.pm",
+  "bugs": {
+    "url": "https://github.com/gnosis/gnosis-safe/issues"
+  },
+  "private": true,
+  "workspaces": ["safe-contracts", "safe-core-sdk", "safe-pg"],
+  "devDependencies": {
+  },
+  "dependencies": {}
+}
