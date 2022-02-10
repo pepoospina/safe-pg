@@ -30,6 +30,19 @@ export const contractConnectorConfig = () => {
         hardhatContractsJson
       ),
 
+      GnosisSafe: createConnectorForHardhatContract(
+        'GnosisSafe',
+        hardhatContracts.GnosisSafe__factory,
+        hardhatContractsJson
+      ),
+
+      DefaultCallbackHandler: createConnectorForHardhatContract(
+        'DefaultCallbackHandler',
+        hardhatContracts.DefaultCallbackHandler__factory,
+        hardhatContractsJson
+      ),
+
+
       // 🙋🏽‍♂️ Add your external contracts here, make sure to define the address in `externalContractsConfig.ts`
       // DAI: createConnectorForExternalContract('DAI', externalContracts.DAI__factory, externalContractsAddressMap),
       // UNI: createConnectorForExternalContract('UNI', externalContracts.UNI__factory, externalContractsAddressMap),

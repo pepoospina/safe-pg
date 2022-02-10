@@ -27,7 +27,7 @@ export interface IScaffoldAppProviders {
 export const useScaffoldProviders = (): IScaffoldAppProviders => {
   const [web3Config, setWeb3Config] = useState<Partial<ICoreOptions>>();
   const ethersContext = useEthersContext();
-  const [mainnetAdaptor] = useEthersAdaptorFromProviderOrSigners(MAINNET_PROVIDER);
+  // const [mainnetAdaptor] = useEthersAdaptorFromProviderOrSigners(MAINNET_PROVIDER);
   const [localAdaptor] = useEthersAdaptorFromProviderOrSigners(LOCAL_PROVIDER);
 
   const firstLoadRef = useRef(true);
@@ -94,7 +94,7 @@ export const useScaffoldProviders = (): IScaffoldAppProviders => {
 
   return {
     currentProvider: ethersContext.provider ?? LOCAL_PROVIDER,
-    mainnetAdaptor: mainnetAdaptor,
+    mainnetAdaptor: undefined,
     localAdaptor: localAdaptor,
     targetNetwork: TARGET_NETWORK_INFO,
     createLoginConnector: createLoginConnector,

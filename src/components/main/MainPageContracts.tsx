@@ -20,7 +20,8 @@ export interface IMainPageContractsProps {
 export const MainPageContracts: FC<IMainPageContractsProps> = (props) => {
   const ethersContext = useEthersContext();
   // const mainnetDai = useAppContracts('DAI', NETWORKS.mainnet.chainId);
-  const yourContract = useAppContracts('GnosisSafeProxyFactory', ethersContext.chainId);
+  const proxyContract = useAppContracts('GnosisSafeProxyFactory', ethersContext.chainId);
+  const masterCopy = useAppContracts('GnosisSafe', ethersContext.chainId);
 
   if (ethersContext.account == null) {
     return <></>;
@@ -36,10 +37,18 @@ export const MainPageContracts: FC<IMainPageContractsProps> = (props) => {
         ********** */}
         <GenericContract
           contractName="GnosisSafeProxy"
-          contract={yourContract}
+          contract={proxyContract}
           mainnetAdaptor={props.scaffoldAppProviders.mainnetAdaptor}
           blockExplorer={props.scaffoldAppProviders.targetNetwork.blockExplorer}
         />
+
+        <GenericContract
+          contractName="GnosisSafe"
+          contract={masterCopy}
+          mainnetAdaptor={props.scaffoldAppProviders.mainnetAdaptor}
+          blockExplorer={props.scaffoldAppProviders.targetNetwork.blockExplorer}
+        />
+
 
         {/* **********
          * ❓ uncomment for a second contract:
