@@ -1,6 +1,6 @@
 import { Button, Col, Input, Row } from 'antd';
-import { BigNumber, BigNumberish, BytesLike } from 'ethers';
-import React, { useState, FC, useContext, SetStateAction, useReducer } from 'react';
+import { BigNumber, BigNumberish, BytesLike, EventFilter } from 'ethers';
+import React, { useState, FC, useContext, SetStateAction, useReducer, useEffect } from 'react';
 
 import { transactor } from 'eth-components/functions';
 import { StaticJsonRpcProvider } from '@ethersproject/providers';
@@ -18,6 +18,7 @@ export interface IGnosisUIProps {
   mainnetProvider: StaticJsonRpcProvider | undefined;
   yourCurrentBalance: BigNumber | undefined;
   price: number;
+  account: string | undefined;
 }
 
 interface OwnerDetails {
@@ -27,7 +28,10 @@ interface OwnerDetails {
 
 interface IState {
   owners: OwnerDetails[];
-  threshold: number;
+}
+
+const randomKey = () => {
+  return Math.floor(Math.random()*100000000).toString()
 }
 
 const stateReducer = (state: IState, action: any) => {
@@ -40,7 +44,7 @@ const stateReducer = (state: IState, action: any) => {
       break;
     
     case 'new': 
-      const newOwner: OwnerDetails = { key: Math.floor(Math.random()*1000000).toString(), address: ''};
+      const newOwner: OwnerDetails = { key: randomKey(), address: ''};
       state.owners = [...state.owners.concat(newOwner)];
       console.log('new()', { newOwner, state: JSON.stringify(state)});
       break;
@@ -67,11 +71,24 @@ export const GnosisUI: FC<IGnosisUIProps> = (props) => {
   const [gasPrice] = useGasPrice(ethersContext.chainId, 'fast');
   const tx = transactor(ethComponentsSettings, ethersContext?.signer, gasPrice);
 
-  const { mainnetProvider, yourCurrentBalance, price } = props;
+  const { mainnetProvider, yourCurrentBalance, price, account } = props;
+
+  const owner ={ address: account ? account : '', key: randomKey() }; 
 
   /** State Management */
-  const [state, dispatch] = useReducer(stateReducer, { owners: [], threshold: 1});
-  const [threshold, setThreshold] = useState(1);
+  const [state, dispatch] = useReducer(stateReducer, { owners: [owner] });
+  const [threshold, setThreshold] = useState<number>(1);
+  const [proxiesDeployed, setProxiesDeployed] = useState<string[]>([]);
+
+  /** */
+
+  const getProxiesDeployed = async () => {
+    if (!proxyFactory) return;
+    const filter = proxyFactory.filters.ProxyCreation();
+    const result = await proxyFactory.queryFilter(filter);
+    const proxies: string[] = result.map(ev => ev.args.proxy);
+    setProxiesDeployed(proxies);
+  }
   
   /** --- */
 
@@ -111,24 +128,10 @@ export const GnosisUI: FC<IGnosisUIProps> = (props) => {
     /* look how you call setPurpose on your contract: */
     /* notice how you pass a call back for tx updates too */
 
-    const txCaller = tx(proxyFactory.createProxy(masterCopy.address, safeAbi), (update: any) => {
-      console.log('Transaction Update:', update);
-      
-      if (update && (update.status === 'confirmed' || update.status === 1)) {
-        console.log(' 🍾 Transaction ' + update.hash + ' finished!');
-        console.log(
-          ' ⛽️ ' +
-            update.gasUsed +
-            '/' +
-            (update.gasLimit || update.gas) +
-            ' @ ' +
-            parseFloat(update.gasPrice) / 1000000000 +
-            ' gwei'
-        );
-      }
-    });
-    const res = await txCaller;
-    console.log({res});
+    const txReceipt = await proxyFactory.createProxy(masterCopy.address, safeAbi);
+    
+    /** update */
+    txReceipt.wait().then(() => getProxiesDeployed());
   }
 
   const ownerChanged = (key: string, value: string) => {
@@ -138,6 +141,10 @@ export const GnosisUI: FC<IGnosisUIProps> = (props) => {
   const ownerRemoved = (key: string) => {
     dispatch({type: 'remove', key})
   }
+
+  useEffect(() => {
+    getProxiesDeployed();
+  }, [])
 
   console.log('GnosisUI render()', JSON.stringify(state))
 
@@ -158,11 +165,15 @@ export const GnosisUI: FC<IGnosisUIProps> = (props) => {
         )
       })}
 
-      <Input type="number" onChange={(v) => setThreshold(parseInt(v.currentTarget.value))}></Input>
+      <Input type="number" value={threshold} onChange={(v) => setThreshold(parseInt(v.currentTarget.value))}></Input>
       
       <Button onClick={() => dispatch({type: 'new'})}>Add owner</Button> 
       <br></br>
       <Button onClick={deploySafe} type="primary">Deploy Safe</Button>
+
+      {proxiesDeployed.map(proxy => {
+        return <div>{proxy}</div>
+      })}
       
     </div>
   );

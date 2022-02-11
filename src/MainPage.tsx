@@ -102,6 +102,7 @@ export const Main: FC = () => {
               mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider}
               yourCurrentBalance={yourCurrentBalance}
               price={ethPrice}
+              account={ethersContext.account}
             />
           </Route>
           {/* Subgraph also disabled in MainPageMenu, it does not work, see github issue! */}
